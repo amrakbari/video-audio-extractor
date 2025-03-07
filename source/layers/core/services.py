@@ -5,5 +5,5 @@ from layers.core.entities import VideoEntity, AudioEntity
 
 class IAudioExtractorService(ABC):
     @classmethod
-    def extract_audio(cls, video: VideoEntity) -> AudioEntity:
+    def extract(cls, video_path: str) -> str:
         pass
