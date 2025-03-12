@@ -1,3 +1,4 @@
+from django.db import models
 from rest_framework.generics import get_object_or_404
 
 from audio_extractor.models import Video, Audio
@@ -6,28 +7,32 @@ from layers.core.repositories import IVideoRepository, IAudioRepository
 
 
 class VideoRepository(IVideoRepository):
-    def __init__(self, model: Video):
-        self.model = model
+    def __init__(self):
+        self.model = Video
 
-    def insert_video(self, audio: AudioEntity) -> VideoEntity:
-        video = self.model.objects.create(
-            path=audio.path,
+    def insert_video(self, video: VideoEntity) -> VideoEntity:
+        video_object = self.model.objects.create(
+            path=video.path,
+            name=video.name,
         )
         return VideoEntity(
-            id=video.id,
-            path=video.path,
+            id=video_object.id,
+            name=video.name,
+            path=video_object.path,
+            audio_status=video_object.audio_extraction_status,
         )
 
     def get_video(self, video_id: int) -> VideoEntity:
         video = get_object_or_404(Video, id=video_id)
         return VideoEntity(
             id=video.id,
+            name=video.name,
             path=video.path,
         )
 
 class AudioRepository(IAudioRepository):
-    def __init__(self, model: Audio):
-        self.model = model
+    def __init__(self):
+        self.model = Audio
 
     def insert_audio(self, audio: AudioEntity) -> AudioEntity:
         audio = self.model.objects.create(

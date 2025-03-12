@@ -1,9 +1,9 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from layers.core.entities import VideoEntity, AudioEntity
 
 
 class IAudioExtractorService(ABC):
-    @classmethod
-    def extract(cls, video_path: str) -> str:
+    @abstractmethod
+    def extract(self, video_path: str) -> str:
         pass

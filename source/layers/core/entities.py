@@ -3,8 +3,10 @@ from dataclasses import dataclass
 
 @dataclass
 class VideoEntity:
-    id: int
     path: str
+    name: str
+    id: int | None = None
+    audio_status: str | None = None
 
 @dataclass
 class AudioEntity:
