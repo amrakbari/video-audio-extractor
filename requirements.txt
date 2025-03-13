@@ -1,3 +1,7 @@
 django
 djangorestframework
 dotenv
+moviepy
+drf_spectacular
+celery
+redis
