@@ -1,3 +1,5 @@
+from typing import NoReturn
+
 from django.db import models
 from rest_framework.generics import get_object_or_404
 
@@ -23,12 +25,34 @@ class VideoRepository(IVideoRepository):
         )
 
     def get_video(self, video_id: int) -> VideoEntity:
-        video = get_object_or_404(Video, id=video_id)
+        video = get_object_or_404(self.model, id=video_id)
         return VideoEntity(
             id=video.id,
             name=video.name,
             path=video.path,
+            audio_status=video.audio_extraction_status,
         )
+
+    def get_video_and_set_audio_status_to_declared_status(self, video_id: int, status: str) -> VideoEntity:
+        video = get_object_or_404(self.model, id=video_id)
+        video.audio_extraction_status = status
+        video.save()
+        return VideoEntity(
+            id=video.id,
+            name=video.name,
+            path=video.path,
+            audio_status=video.audio_extraction_status,
+        )
+
+    def set_audio_status_to_in_progress(self, video_id: int) -> None:
+        self.model.objects.filter(id=video_id).update(audio_extraction_status='progress')
+
+    def set_audio_status_to_completed(self, video_id: int) -> None:
+        self.model.objects.filter(id=video_id).update(audio_extraction_status='completed')
+
+    def set_audio_status_to_error(self, video_id: int) -> None:
+        self.model.objects.filter(id=video_id).update(audio_extraction_status='error')
+
 
 class AudioRepository(IAudioRepository):
     def __init__(self):
