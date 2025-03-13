@@ -20,5 +20,7 @@ def process_audio_extraction_task(video_id: int):
             audio_extractor_service=AudioExtractorService()
         )
         use_case.execute(video_id)
+        print('audio extraction task completed successfully')
     except AudioExtractionFailed as e:
+        print('error:', e.message)
         VideoRepository().set_audio_status_to_error(video_id=video_id)

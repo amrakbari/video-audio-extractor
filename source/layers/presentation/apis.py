@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 from layers.core.entities import VideoEntity
 from layers.infrastructure.repositories import VideoRepository, AudioRepository
+from layers.presentation.tasks import process_audio_extraction_task
 
 
 class VideoAPIView(APIView):
@@ -41,8 +42,7 @@ class VideoAPIView(APIView):
             ),
         )
 
-        #TODO call celery task to execute AudioExtractionUseCase.execute()
-
+        process_audio_extraction_task.delay(video.id)
 
         serializer = self.UploadVideoOutputSerializer(
             path=video.path,
