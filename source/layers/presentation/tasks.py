@@ -24,3 +24,4 @@ def process_audio_extraction_task(video_id: int):
     except AudioExtractionFailed as e:
         print('error:', e.message)
         VideoRepository().set_audio_status_to_error(video_id=video_id)
+        raise e
