@@ -1,7 +1,9 @@
 import os
+import uuid
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.db import IntegrityError
 from django.core.files.storage import default_storage
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import serializers, status
@@ -27,6 +29,7 @@ class VideoAPIView(APIView):
         path = serializers.CharField(max_length=2000)
         name = serializers.CharField(max_length=255)
         audio_status = serializers.CharField(max_length=20)
+        
     @extend_schema(
         summary='Upload Video',
         description='Upload a video file and trigger audio extraction',
@@ -46,23 +49,39 @@ class VideoAPIView(APIView):
         serializer = self.UploadVideoInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
-        file = validated_data["file"]
+        
+        uploaded_file = validated_data["file"]
         name = validated_data["name"]
-        file_path = os.path.join(settings.MEDIA_ROOT, 'videos', str(file))
-        path = default_storage.save(file_path, ContentFile(file.read()))
-        video = self.video_repo.insert_video(
-            VideoEntity(
-                path=path,
-                name=name,
-            ),
-        )
+        
+        file_extension = os.path.splitext(uploaded_file.name)[1]
+        safe_filename = f"{uuid.uuid4()}{file_extension}"
+        
+        relative_path = os.path.join('videos', safe_filename)
+        
+        path = default_storage.save(relative_path, ContentFile(uploaded_file.read()))
+        try:
+        
+            video = self.video_repo.insert_video(
+                VideoEntity(
+                    path=path,
+                    name=name,
+                ),
+            )
+        except IntegrityError as e:
+            default_storage.delete(path)
+            return Response(
+                {"error": "Video already exists"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         process_audio_extraction_task.delay(video.id)
 
         serializer = self.UploadVideoOutputSerializer(
-            path=video.path,
-            name=video.name,
-            audio_status=video.audio_status,
+            data={
+                'path': path,
+                'name': video.name,
+                'audio_status': video.audio_status,
+            }
         )
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
