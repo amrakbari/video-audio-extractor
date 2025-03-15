@@ -15,11 +15,11 @@ class Video(BaseModel):
         (STATUS_ERROR, 'Error'),
     )
 
-    path = models.FilePathField()
+    path = models.FileField(upload_to='videos/')
     name = models.CharField(max_length=255, unique=True)
     audio_extraction_status = models.CharField(max_length=20, choices=AUDIO_EXTRACTION_STATUS_CHOICES, default=STATUS_PENDING)
 
 
 class Audio(BaseModel):
-    path = models.FilePathField()
+    path = models.FileField(upload_to='audios/')
     video = models.ForeignKey(Video, on_delete=models.SET_NULL, null=True)
