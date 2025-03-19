@@ -20,7 +20,7 @@ class VideoRepository(IVideoRepository):
         return VideoEntity(
             id=video_object.id,
             name=video.name,
-            path=video_object.path,
+            path=str(video_object.path),
             audio_status=video_object.audio_extraction_status,
         )
 
@@ -29,7 +29,7 @@ class VideoRepository(IVideoRepository):
         return VideoEntity(
             id=video.id,
             name=video.name,
-            path=video.path,
+            path=str(video.path),
             audio_status=video.audio_extraction_status,
         )
 
@@ -60,12 +60,12 @@ class AudioRepository(IAudioRepository):
 
     def insert_audio(self, audio: AudioEntity) -> AudioEntity:
         audio = self.model.objects.create(
-            path=audio.path,
+            path=str(audio.path),
             video_id=audio.video_id,
         )
         return AudioEntity(
             id=audio.id,
-            path=audio.path,
+            path=str(audio.path),
             video_id=audio.video_id,
         )
 
@@ -73,6 +73,6 @@ class AudioRepository(IAudioRepository):
         audio = get_object_or_404(Audio, id=audio_id)
         return AudioEntity(
             id=audio.id,
-            path=audio.path,
+            path=str(audio.path),
             video_id=audio.videoـid,
         )
