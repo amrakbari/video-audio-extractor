@@ -19,7 +19,8 @@ class AudioExtractorService(IAudioExtractorService):
             audio_path = f"audios/{base_name}.mp3"
             abs_audio_path = os.path.join(settings.MEDIA_ROOT, audio_path)
             abs_video_path = os.path.join(settings.MEDIA_ROOT, video_path)
-            
+            if not os.path.exists(abs_video_path):
+                raise AudioExtractionFailed(video_id=video_id, 'video does not exist')
             os.makedirs(os.path.dirname(abs_audio_path), exist_ok=True)
             
             print(f"Video path: {abs_video_path}")
