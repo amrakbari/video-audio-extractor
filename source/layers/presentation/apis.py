@@ -10,7 +10,9 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from layers.core.business_rules import VideoBusinessRules
 from layers.core.entities import VideoEntity
+from layers.core.exceptions import InvalidVideoFormatException
 from layers.infrastructure.repositories import VideoRepository, AudioRepository
 from layers.presentation.tasks import process_audio_extraction_task
 
@@ -40,7 +42,7 @@ class VideoAPIView(APIView):
                 description='Video uploaded successfully'
             ),
             400: OpenApiResponse(
-                description='Invalid input'
+                description='Invalid input or video format'
             )
         },
         tags=['Videos']
@@ -53,6 +55,14 @@ class VideoAPIView(APIView):
         uploaded_file = validated_data["file"]
         name = validated_data["name"]
         
+        try:
+            VideoBusinessRules.validate_video_format(uploaded_file.name)
+        except InvalidVideoFormatException as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         file_extension = os.path.splitext(uploaded_file.name)[1]
         safe_filename = f"{uuid.uuid4()}{file_extension}"
         
@@ -60,7 +70,6 @@ class VideoAPIView(APIView):
         
         path = default_storage.save(relative_path, ContentFile(uploaded_file.read()))
         try:
-        
             video = self.video_repo.insert_video(
                 VideoEntity(
                     path=path,

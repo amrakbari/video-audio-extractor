@@ -11,6 +11,8 @@ class AudioExtractionUseCase:
 
     def execute(self, video_id: int) -> AudioEntity:
         video = self.video_repo.get_video_and_set_audio_status_to_declared_status(video_id, 'progress')
+        
+        
         audio_path = self.audio_extractor_service.extract(video.path, video.id)
         self.video_repo.set_audio_status_to_completed(video.id)
         audio = AudioEntity(

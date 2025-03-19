@@ -40,7 +40,7 @@ class VideoRepository(IVideoRepository):
         return VideoEntity(
             id=video.id,
             name=video.name,
-            path=video.path,
+            path=str(video.path),
             audio_status=video.audio_extraction_status,
         )
 
