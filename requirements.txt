@@ -5,3 +5,5 @@ moviepy
 drf_spectacular
 celery
 redis
+pytest
+pytest-django

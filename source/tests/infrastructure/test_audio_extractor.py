@@ -21,7 +21,6 @@ class TestAudioExtractorService:
 
     def test_extract_success(self, service, mock_video_path, mock_audio_path):
         """Test successful audio extraction"""
-        # Arrange
         video_id = 1
         abs_video_path = os.path.join(settings.MEDIA_ROOT, mock_video_path)
         abs_audio_path = os.path.join(settings.MEDIA_ROOT, mock_audio_path)

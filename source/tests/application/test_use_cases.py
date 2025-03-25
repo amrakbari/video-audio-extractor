@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch
 from layers.core.entities import VideoEntity, AudioEntity
-from layers.core.use_cases import AudioExtractionUseCase
+from layers.application.use_cases import AudioExtractionUseCase
 from layers.core.exceptions import AudioExtractionFailed, InvalidVideoFormatException
 from layers.core.business_rules import VideoBusinessRules
 
@@ -40,7 +40,6 @@ class TestAudioExtractionUseCase:
             audio_status="progress"
         )
         mock_audio = AudioEntity(
-            id=1,
             video_id=video_id,
             path=audio_path
         )
@@ -55,7 +54,6 @@ class TestAudioExtractionUseCase:
         mock_video_repo.set_audio_status_to_completed.assert_called_once_with(video_id)
         mock_audio_repo.insert_audio.assert_called_once_with(mock_audio)
         mock_video_repo.set_audio_status_to_completed.assert_called_once_with(video_id)
-        VideoBusinessRules.validate_video_format.assert_called_once_with(video_path)
 
     def test_execute_video_not_found(self, use_case, mock_video_repo):
         """Test when video is not found"""

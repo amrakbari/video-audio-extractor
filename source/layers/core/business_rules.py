@@ -9,8 +9,12 @@ class VideoBusinessRules:
 
     @classmethod
     def validate_video_format(cls, file_name: str) -> None:
-        _, extension = file_name.split('.')
-        extension = extension.lower()
+        filename_parts = file_name.split('.')
+        if len(filename_parts) > 1:
+            extension = filename_parts[-1]
+            extension = extension.lower()
+        else:
+            extension = ''
         
         if extension not in cls.ALLOWED_VIDEO_EXTENSIONS:
             raise InvalidVideoFormatException(extension)
