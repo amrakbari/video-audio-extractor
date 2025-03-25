@@ -10,6 +10,10 @@ class IVideoRepository(ABC):
         pass
 
     @abstractmethod
+    def get_video_by_name(self, video_name: str) -> VideoEntity:
+        pass
+
+    @abstractmethod
     def insert_video(self, video: VideoEntity) -> VideoEntity:
         pass
 

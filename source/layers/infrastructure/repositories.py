@@ -33,6 +33,15 @@ class VideoRepository(IVideoRepository):
             audio_status=video.audio_extraction_status,
         )
 
+    def get_video_by_name(self, video_name: str) -> VideoEntity:
+        video = get_object_or_404(self.model, id=video_name)
+        return VideoEntity(
+            id=video.id,
+            name=video.name,
+            path=str(video.path),
+            audio_status=video.audio_extraction_status,
+        )
+
     def get_video_and_set_audio_status_to_declared_status(self, video_id: int, status: str) -> VideoEntity:
         video = get_object_or_404(self.model, id=video_id)
         video.audio_extraction_status = status

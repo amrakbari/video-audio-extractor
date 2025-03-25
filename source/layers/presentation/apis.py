@@ -94,6 +94,28 @@ class VideoAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+class AudioExtractionStatusApiView(APIView):
+    class OutputSerializer(serializers.Serializer):
+        path = serializers.CharField(max_length=1000)
+        name = serializers.CharField(max_length=255)
+        id = serializers.IntegerField()
+        audio_status = serializers.CharField(max_length=20)
+
+    def __init__(self):
+        super().__init__()
+        self.video_repo = VideoRepository()
+
+    def get(self, video_name: str):
+        video = self.video_repo.get_video_by_name(video_name)
+        serializer = self.OutputSerializer(data={
+            'id': video.id,
+            'path': video.path,
+            'name': video.name,
+            'audio_status': video.audio_status,
+        })
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class AudioApiView(APIView):
     def __init__(self):
         super().__init__()
