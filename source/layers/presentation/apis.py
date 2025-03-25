@@ -93,3 +93,10 @@ class VideoAPIView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class AudioApiView(APIView):
+    def __init__(self):
+        super().__init__()
+        self.audio_repo = AudioRepository()
+        self.video_repo = VideoRepository()
+
