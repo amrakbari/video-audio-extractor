@@ -117,8 +117,27 @@ class AudioExtractionStatusApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AudioApiView(APIView):
+    class OutputSerializer(serializers.Serializer):
+        path = serializers.CharField(max_length=1000)
+        id = serializers.IntegerField()
+
     def __init__(self):
         super().__init__()
         self.audio_repo = AudioRepository()
         self.video_repo = VideoRepository()
+
+    def get(self, video_name: str):
+        video = self.video_repo.get_video_by_name(video_name)
+        if video.audio_status != 'error' or video.audio_status != 'pending' or video.audio_status != 'progress':
+            return Response(
+                {"error": "Audio extraction is not completed"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        audio = self.audio_repo.get_audio(video.id)
+        serializer = self.OutputSerializer(data={
+            'id': audio.id,
+            'path': audio.path,
+        })
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
